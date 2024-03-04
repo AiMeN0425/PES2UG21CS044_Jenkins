@@ -1,35 +1,36 @@
-
 pipeline {
-agent any
-    stages { 
-        stage('Build') { 
-            steps {
-                sh 'mvn clean install'
-                echo 'Build Stage Successful'
-                }
-            }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-                echo 'Test Stage Successful'
-                post {
-                    always {
-                            junit 'target/surefire-reports/*.xml
-                        }
-                    }
-                }
-            }
-        stage('Deploy') {     
-            steps {
-                    sh 'mvn deploy'
-                    echo 'Deployment Successful'
-                    }
-                }
+    agent {
+        docker {
+            image 'node:14'
         }
-        post {            
-            failure {
-                echo 'Pipeline failed'
     }
+    stages {
+        stage('Clone repository') {
+            steps {
+                git branch: 'main',
+                url: 'https://github.com/AiMeN0425/PES2UG21CS044_Jenkins.git'
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Build application') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+        stage('Test application') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage('Push Docker image') {
+            steps {
+                sh "docker build -t <user>/<image>:$BUILD_NUMBER ."
+                sh "docker push <user>/<image>:$BUILD_NUMBER"
+            }
+        }
     }
 }
