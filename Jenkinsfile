@@ -12,25 +12,25 @@ stages {
 //}
 
 stage('Build') {
+    steps {
+      build 'PES2UG19CS159-1'
+      sh 'g++ main.cpp -o output'
+    }
+  }
+    stage('Test') {
 steps {
-build 'PES2UG19CS159-1'
-sh 'g++ main.cpp -o output'
-}
-}
-stage('Test') {
-steps {
-sh './output'
-}
+    sh './output'
+  }
 }
 stage('Deploy') {
   steps {
-echo 'deploy'
-}
+    echo 'deploy'
+  }
 }
 post{
-failure{
-error 'Pipeline failed'
-}
-}
-}
+  failure{
+      error 'Pipeline failed'
+      }
+    }
+  }
 }
